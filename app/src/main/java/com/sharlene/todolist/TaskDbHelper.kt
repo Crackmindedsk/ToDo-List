@@ -3,8 +3,10 @@ package com.sharlene.todolist
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.util.*
 
 class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, version) {
 
@@ -14,7 +16,7 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
     }
 
     override fun onCreate(p0: SQLiteDatabase?) {
-        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER)"
+        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER , date VARCHAR DEFAULT NULL, time VARCHAR DEFAULT NULL, reminder VARCHAR DEFAULT NULL)"
         p0?.execSQL(CREATE)
     }
 
@@ -23,18 +25,22 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
         onCreate(p0)
     }
 
-    public fun insert( taskName: String, intial: Int, final: Int, db:SQLiteDatabase?){
+    fun insert( taskName: String, intial: Int, final: Int, date: String, time: String, reminder:String, db:SQLiteDatabase?){
         val value: ContentValues = ContentValues().apply {
             put("task_name", taskName)
             put("initial", intial)
             put("final", final)
+            put("date",date)
+            put("time",time)
+            put("reminder",reminder)
         }
         db?.insert("tasks",null,value)
     }
 
-    fun readAll():Cursor{
-        val db:SQLiteDatabase=writableDatabase
-        return db.rawQuery("SELECT * FROM tasks",null)
+    fun readAll():Int{
+        val db:SQLiteDatabase=readableDatabase
+        val count = DatabaseUtils.queryNumEntries(db,"tasks")
+        return count.toInt()
     }
 
     fun readSpecific(Name: String): Cursor? {
@@ -51,7 +57,9 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
 
     fun delete (Name: String){
         val db : SQLiteDatabase = this.writableDatabase
-        val delete = "DELETE FROM tasks WHERE task_name ='$Name'"
+        val delete = "DELETE FROM tasks WHERE task_name = '$Name'"
         db.execSQL(delete)
     }
+
+
 }

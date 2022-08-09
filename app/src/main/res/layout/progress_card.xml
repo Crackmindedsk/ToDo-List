@@ -13,6 +13,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"/>
         <TextView
             android:id="@+id/Text1"
             android:layout_width="wrap_content"
@@ -23,27 +30,59 @@
             android:layout_marginTop="4dp"
             android:layout_marginStart="10dp"
             />
-            <TextView
-                android:id="@+id/Text2"
-                android:layout_width="wrap_content"
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="12/20"
-                style="@style/TextAppearance.AppCompat"
-                android:textColor="@color/cardview_dark_background"
-                android:textSize="25sp"
-                android:layout_marginStart="11dp"
-                android:layout_marginBottom="2dp"
-                />
+                android:orientation="horizontal">
+
+
             <ProgressBar
                 style="@android:style/Widget.ProgressBar.Horizontal"
                 android:id="@+id/progressBar1"
-                android:layout_width="match_parent"
+                android:layout_width="230dp"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:progress="0"
                 android:progressBackgroundTint="@color/teal_200"
                 android:progressTint="@color/teal_700"
                 />
+                <TextView
+                    android:id="@+id/Text2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12/20"
+                    style="@style/TextAppearance.AppCompat"
+                    android:textColor="@color/cardview_dark_background"
+                    android:textSize="25sp"
+                    android:layout_marginEnd="11dp"
+                    android:layout_marginBottom="2dp"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/date_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date,Time"
+                android:textSize="25sp"
+                style="@style/TextAppearance.AppCompat"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="10dp"/>
+
+                <TextView
+                    android:id="@+id/reminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remainder time"
+                    android:textSize="25sp"
+                    style="@style/TextAppearance.AppCompat"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="30dp"/>
+            </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </RelativeLayout>

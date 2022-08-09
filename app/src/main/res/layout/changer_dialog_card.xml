@@ -22,25 +22,30 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/add"
-                android:layout_width="100dp"
+                android:id="@+id/minus"
+                android:layout_width="90dp"
                 android:layout_height="100dp"
                 android:background="@color/white"
-                android:src="@drawable/ic_add" />
-
+                android:src="@drawable/ic_minus" />
+            <ImageButton
+                android:id="@+id/edit"
+                android:layout_width="90dp"
+                android:layout_height="100dp"
+                android:background="@color/white"
+                android:src="@drawable/ic_edit" />
             <ImageButton
                 android:id="@+id/delete"
-                android:layout_width="100dp"
+                android:layout_width="90dp"
                 android:layout_height="100dp"
                 android:background="@color/white"
                 android:src="@drawable/ic_baseline_delete_24" />
 
             <ImageButton
-                android:id="@+id/minus"
-                android:layout_width="100dp"
+                android:id="@+id/add"
+                android:layout_width="90dp"
                 android:layout_height="100dp"
                 android:background="@color/white"
-                android:src="@drawable/ic_minus" />
+                android:src="@drawable/ic_add" />
 
         </LinearLayout>
 
