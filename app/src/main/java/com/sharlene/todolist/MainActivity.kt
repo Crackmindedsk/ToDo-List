@@ -82,7 +82,6 @@ class MainActivity : AppCompatActivity() {
         if(dbHelper!!.readAll() == 0){
             viewList.visibility=View.GONE
             empty.visibility = View.VISIBLE
-            Toast.makeText(applicationContext,"H",Toast.LENGTH_SHORT).show()
         }else {
             viewList.visibility=View.VISIBLE
             empty.visibility = View.GONE

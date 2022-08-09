@@ -72,9 +72,9 @@ class AddTaskActivity : AppCompatActivity() {
 
         val datePickerDialog =
             DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, tyear, tmonth, tday ->
-                val str = "$tday/$tmonth/$tyear"
+                val str = String.format("%d / %d / %d",tday,tmonth+1,tyear)
                 date.text = str.toEditable()
-            }, day, month, year)
+            }, year, month, day)
         datePickerDialog.show()
     }
 

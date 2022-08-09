@@ -19,13 +19,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/empty_view"
-        android:visibility="gone">
+        android:visibility="visible">
         <ImageView
             android:id="@+id/im"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add_task"
-            android:layout_gravity="center"
+            android:layout_gravity="center_vertical"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -33,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Get Started!!\nAdd task by clicking the plus button"
+        android:layout_margin="10dp"
         android:textSize="30sp"
         app:layout_constraintTop_toBottomOf="@id/im"
         android:gravity="center_horizontal"
