@@ -5,17 +5,17 @@
     <item
         android:id="@+id/home"
         android:title="Home"
-        app:showAsAction="always"/>
+        android:icon="@drawable/ic_home"/>
     <item
         android:id="@+id/graph"
         android:title="Graph"
-        app:showAsAction="always"/>
+        android:icon="@drawable/ic_graph"/>
     <item
         android:id="@+id/goal"
         android:title="Goals"
-        app:showAsAction="always"/>
+        android:icon="@drawable/ic_goal"/>
     <item
         android:id="@+id/general_task"
         android:title="G. Task"
-        app:showAsAction="always"/>
+        android:icon="@drawable/ic_edit"/>
 </menu>

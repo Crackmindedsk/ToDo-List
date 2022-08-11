@@ -41,22 +41,23 @@ class MainActivity : AppCompatActivity() {
     var dateValue: ArrayList<String>? = null
     var timeValue: ArrayList<String>? = null
     var reminderValue: ArrayList<String>? = null
-    var adapter:TaskAdapter?=null
-    private var listener: TaskAdapter.RecyclerViewClickListener?= null
+    var adapter: TaskAdapter? = null
+    private var listener: TaskAdapter.RecyclerViewClickListener? = null
     lateinit var bottomNav: BottomNavigationView
+    lateinit var bottomNav2: BottomNavigationView
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.main_menu,menu)
+        inflater.inflate(R.menu.main_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-        if (id == R.id.setting){
+        if (id == R.id.setting) {
             return true
-        }else if(id == R.id.alarm_tone){
+        } else if (id == R.id.alarm_tone) {
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -66,24 +67,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_view)
         val viewList = findViewById<View>(R.id.recycler_view) as RecyclerView
-        TaskName= ArrayList()
-        initialValue= ArrayList()
+        TaskName = ArrayList()
+        initialValue = ArrayList()
         finalValue = ArrayList()
         dateValue = ArrayList()
         timeValue = ArrayList()
         reminderValue = ArrayList()
         dbHelper = TaskDbHelper(this)
-        val empty:ConstraintLayout = findViewById(R.id.empty_view)
+        val empty: ConstraintLayout = findViewById(R.id.empty_view)
 
 //            selectData()
 //            setOnClickListener()
 
 
-        if(dbHelper!!.readAll() == 0){
-            viewList.visibility=View.GONE
+        if (dbHelper!!.readAll() == 0) {
+            viewList.visibility = View.GONE
             empty.visibility = View.VISIBLE
-        }else {
-            viewList.visibility=View.VISIBLE
+        } else {
+            viewList.visibility = View.VISIBLE
             empty.visibility = View.GONE
             selectData()
             setOnClickListener()
@@ -105,24 +106,24 @@ class MainActivity : AppCompatActivity() {
         val fab: FloatingActionButton = findViewById(R.id.fab)
 
         fab.setOnClickListener { v ->
-            val intent = Intent(applicationContext,AddTaskActivity::class.java)
+            val intent = Intent(applicationContext, AddTaskActivity::class.java)
             startActivity(intent)
         }
 
         //Bottom Navigation
         bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNav.setOnNavigationItemReselectedListener {
-            when(it.itemId){
-                R.id.home->{
+            when (it.itemId) {
+                R.id.home -> {
                     return@setOnNavigationItemReselectedListener
                 }
-                R.id.graph->{
+                R.id.graph -> {
                     return@setOnNavigationItemReselectedListener
                 }
-                R.id.goal->{
+                R.id.goal -> {
                     return@setOnNavigationItemReselectedListener
                 }
-                R.id.general_task->{
+                R.id.general_task -> {
                     return@setOnNavigationItemReselectedListener
                 }
             }
@@ -140,89 +141,98 @@ class MainActivity : AppCompatActivity() {
 //    }
 
 
-    private fun selectData(){
-        val db:SQLiteDatabase= dbHelper!!.readableDatabase
+    private fun selectData() {
+        val db: SQLiteDatabase = dbHelper!!.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM tasks", arrayOf())
         cursor.moveToFirst()
         do {
-            val taskn:String = cursor.getString(0)
-            val taski:Int = cursor.getInt(1)
-            val taskf:Int = cursor.getInt(2)
-            val taskd:String = cursor.getString(3)
-            val taskt:String = cursor.getString(4)
-            val taskr:String = cursor.getString(5)
+            val taskn: String = cursor.getString(0)
+            val taski: Int = cursor.getInt(1)
+            val taskf: Int = cursor.getInt(2)
+            val taskd: String = cursor.getString(3)
+            val taskt: String = cursor.getString(4)
+            val taskr: String = cursor.getString(5)
             TaskName!!.add(taskn)
             initialValue!!.add(taski)
             finalValue!!.add(taskf)
             dateValue?.add(taskd)
             timeValue?.add(taskt)
             reminderValue?.add(taskr)
-        }while (cursor.moveToNext())
+        } while (cursor.moveToNext())
     }
-    private fun selectSingle(string: String){
-        val db:SQLiteDatabase = dbHelper!!.readableDatabase
+
+    private fun selectSingle(string: String) {
+        val db: SQLiteDatabase = dbHelper!!.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM tasks WHERE task_name = '$string'", arrayOf())
         cursor.moveToFirst()
         do {
-            val taskn:String = cursor.getString(0)
-            val taski:Int = cursor.getInt(1)
-            val taskf:Int = cursor.getInt(2)
+            val taskn: String = cursor.getString(0)
+            val taski: Int = cursor.getInt(1)
+            val taskf: Int = cursor.getInt(2)
             TaskName!!.add(taskn)
             initialValue!!.add(taski)
             finalValue!!.add(taskf)
-        }while (cursor.moveToNext())
+        } while (cursor.moveToNext())
     }
 
-    private fun Count():Int{
-        val db:SQLiteDatabase = dbHelper!!.readableDatabase
+    private fun Count(): Int {
+        val db: SQLiteDatabase = dbHelper!!.readableDatabase
         val rowCount = db.rawQuery("SELECT COUNT(*) FROM tasks", arrayOf())
         return rowCount.toString().toInt()
     }
 
-    private fun setOnClickListener(){
-        listener= object :TaskAdapter.RecyclerViewClickListener{
+    private fun setOnClickListener() {
+        listener = object : TaskAdapter.RecyclerViewClickListener {
             override fun onClick(view: View?, position: Int) {
-                val dialogView = layoutInflater.inflate(R.layout.changer_dialog_card, null)
-                val customDialog = AlertDialog.Builder(this@MainActivity)
-                    .setView(dialogView)
-                    .show()
-                val btnAdd = customDialog.findViewById<ImageButton>(R.id.add)
-                val btnDelete = customDialog.findViewById<ImageButton>(R.id.delete)
-                val btnMinus = customDialog.findViewById<ImageButton>(R.id.minus)
-                btnAdd.setOnClickListener { h->
-                    var initial:Int=initialValue!![position]
-                    val name = TaskName!![position]
-                    initial++
-                    dbHelper!!.update(name,initial)
-                    initialValue!!.removeAt(position)
-                    initialValue!!.add(position,initial)
-                    adapter!!.notifyItemChanged(position)
+//                val dialogView = layoutInflater.inflate(R.layout.changer_dialog_card, null)
+//                val customDialog = AlertDialog.Builder(this@MainActivity)
+//                    .setView(dialogView)
+//                    .show()
+                bottomNav2 = findViewById<BottomNavigationView>(R.id.bottomNav2)
+                bottomNav.visibility = View.GONE
+                bottomNav2.visibility = View.VISIBLE
+                bottomNav2.setOnNavigationItemReselectedListener {
+                    when (it.itemId) {
+                        R.id.add -> {
+                            var initial: Int = initialValue!![position]
+                            val name = TaskName!![position]
+                            initial++
+                            dbHelper!!.update(name, initial)
+                            initialValue!!.removeAt(position)
+                            initialValue!!.add(position, initial)
+                            adapter!!.notifyItemChanged(position)
+                        }
+                        R.id.edit -> {}
+                        R.id.delete -> {
+                            val name = TaskName!![position]
+                            dbHelper!!.delete(name)
+                            TaskName!!.removeAt(position)
+                            initialValue!!.removeAt(position)
+                            finalValue!!.removeAt(position)
+                            dateValue?.removeAt(position)
+                            timeValue?.removeAt(position)
+                            reminderValue?.removeAt(position)
+                            adapter!!.notifyDataSetChanged()
 
+                            bottomNav2.visibility = View.VISIBLE
+                            bottomNav.visibility = View.GONE
+                        }
+                        R.id.minus -> {
+                            var initial: Int = initialValue!![position]
+                            val name = TaskName!![position]
+                            initial--
+                            dbHelper!!.update(name, initial)
+                            initialValue!!.removeAt(position)
+                            initialValue!!.add(position, initial)
+                            adapter!!.notifyItemChanged(position)
+                        }
+                    }
                 }
-                btnDelete.setOnClickListener { v->
-                    val name=TaskName!![position]
-                    dbHelper!!.delete(name)
-                    TaskName!!.removeAt(position)
-                    initialValue!!.removeAt(position)
-                    finalValue!!.removeAt(position)
-                    dateValue?.removeAt(position)
-                    timeValue?.removeAt(position)
-                    reminderValue?.removeAt(position)
-                    adapter!!.notifyDataSetChanged()
+                bottomNav.visibility = View.GONE
+                bottomNav2.visibility = View.VISIBLE
 
-                    customDialog.dismiss()
-                }
-                btnMinus.setOnClickListener { v->
-                    var initial:Int=initialValue!![position]
-                    val name = TaskName!![position]
-                    initial--
-                    dbHelper!!.update(name,initial)
-                    initialValue!!.removeAt(position)
-                    initialValue!!.add(position,initial)
-                    adapter!!.notifyItemChanged(position)
-                }
             }
         }
-    }
 
+    }
 }

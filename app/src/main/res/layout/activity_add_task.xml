@@ -52,6 +52,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/edit2"
             android:textSize="30sp"
+            android:inputType="number"
             />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -75,6 +76,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/edit3"
             android:textSize="30sp"
+            android:inputType="number"
             />
 
     </com.google.android.material.textfield.TextInputLayout>

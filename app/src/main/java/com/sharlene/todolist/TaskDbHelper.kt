@@ -16,7 +16,7 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
     }
 
     override fun onCreate(p0: SQLiteDatabase?) {
-        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER , date VARCHAR DEFAULT NULL, time VARCHAR DEFAULT NULL, reminder VARCHAR DEFAULT NULL)"
+        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER , date VARCHAR DEFAULT NULL, time VARCHAR DEFAULT NULL, reminder VARCHAR DEFAULT NULL, status INT DEFAULT NULL)"
         p0?.execSQL(CREATE)
     }
 
@@ -60,6 +60,8 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
         val delete = "DELETE FROM tasks WHERE task_name = '$Name'"
         db.execSQL(delete)
     }
+
+    fun CompletedStatus(){}
 
 
 }
