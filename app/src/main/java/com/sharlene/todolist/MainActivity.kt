@@ -360,7 +360,7 @@ class MainActivity : AppCompatActivity() {
                             dateValue?.removeAt(position)
                             timeValue?.removeAt(position)
                             reminderValue?.removeAt(position)
-                            adapter!!.notifyDataSetChanged()
+                            adapter!!.notifyItemRemoved(position)
 
                             bottomNav2.visibility = View.VISIBLE
                             bottomNav.visibility = View.GONE
