@@ -1,30 +1,22 @@
 package com.sharlene.todolist
 
-import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.content.Intent
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
-import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlin.collections.ArrayList
 import com.sharlene.todolist.TaskDbHelper
+import com.sharlene.todolist.model.CompleteTaskAdapter
 import com.sharlene.todolist.model.TaskAdapter
 import java.text.SimpleDateFormat
 import java.util.*
@@ -41,10 +33,22 @@ class MainActivity : AppCompatActivity() {
     var dateValue: ArrayList<String>? = null
     var timeValue: ArrayList<String>? = null
     var reminderValue: ArrayList<String>? = null
+    lateinit var statusValue:ArrayList<Int>
     var adapter: TaskAdapter? = null
     private var listener: TaskAdapter.RecyclerViewClickListener? = null
+    private var listenerComplete : CompleteTaskAdapter.RecyclerViewClickListener? = null
     lateinit var bottomNav: BottomNavigationView
     lateinit var bottomNav2: BottomNavigationView
+    lateinit var status:CheckBox
+    lateinit var TaskNameComplete: ArrayList<String>
+    var initialValueComplete: ArrayList<Int>? = null
+    var finalValueComplete: ArrayList<Int>? = null
+    var dateValueComplete: ArrayList<String>? = null
+    var timeValueComplete: ArrayList<String>? = null
+    var reminderValueComplete: ArrayList<String>? = null
+    lateinit var statusValueComplete:ArrayList<Int>
+    var adapterComplete: TaskAdapter? = null
+
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -67,40 +71,81 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_view)
         val viewList = findViewById<View>(R.id.recycler_view) as RecyclerView
+        val completeList = findViewById<View>(R.id.recycler_view_completed) as RecyclerView
         TaskName = ArrayList()
         initialValue = ArrayList()
         finalValue = ArrayList()
         dateValue = ArrayList()
         timeValue = ArrayList()
         reminderValue = ArrayList()
+        statusValue = ArrayList()
+        TaskNameComplete = ArrayList()
+        initialValueComplete = ArrayList()
+        finalValueComplete = ArrayList()
+        dateValueComplete = ArrayList()
+        timeValueComplete = ArrayList()
+        reminderValueComplete = ArrayList()
+        statusValueComplete = ArrayList()
+
+
         dbHelper = TaskDbHelper(this)
         val empty: ConstraintLayout = findViewById(R.id.empty_view)
 
 //            selectData()
 //            setOnClickListener()
-
+//        dbHelper!!.updateCheck()
 
         if (dbHelper!!.readAll() == 0) {
             viewList.visibility = View.GONE
             empty.visibility = View.VISIBLE
         } else {
-            viewList.visibility = View.VISIBLE
             empty.visibility = View.GONE
-            selectData()
-            setOnClickListener()
-            adapter = TaskAdapter(
-                this,
-                TaskName!!,
-                initialValue!!,
-                finalValue!!,
-                dateValue!!,
-                timeValue!!,
-                reminderValue!!,
-                listener
-            )
-            viewList.adapter = adapter
-            viewList.layoutManager = LinearLayoutManager(this)
+            if(dbHelper!!.readInComplete() == 0){
+                viewList.visibility = View.GONE
+            }else{
+                viewList.visibility = View.VISIBLE
+
+                selectData()
+                setOnClickListener()
+                adapter = TaskAdapter(
+                    this,
+                    TaskName!!,
+                    initialValue!!,
+                    finalValue!!,
+                    dateValue!!,
+                    timeValue!!,
+                    reminderValue!!,
+                    statusValue,
+                    listener
+                )
+                viewList.adapter = adapter
+                viewList.layoutManager = LinearLayoutManager(this)
+            }
+            completeList.visibility=View.GONE
+
+//            if(dbHelper!!.readComplete() == 0){
+//                completeList.visibility = View.GONE
+//            }else {
+//                completeList.visibility = View.VISIBLE
+//                selectCompleteData()
+//                setOnClickListener()
+//                adapterComplete = TaskAdapter(
+//                    this,
+//                    TaskNameComplete,
+//                    initialValueComplete!!,
+//                    finalValueComplete!!,
+//                    dateValueComplete!!,
+//                    timeValueComplete!!,
+//                    reminderValueComplete!!,
+//                    statusValueComplete,
+//                    listener
+//                )
+//                completeList.adapter = adapterComplete
+//                completeList.layoutManager = LinearLayoutManager(this)
+//            }
+
         }
+
 
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
@@ -129,8 +174,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
     }
+
+
+
+
 
 
 //    private  fun loadFragment(fragment: Fragment){
@@ -152,12 +200,35 @@ class MainActivity : AppCompatActivity() {
             val taskd: String = cursor.getString(3)
             val taskt: String = cursor.getString(4)
             val taskr: String = cursor.getString(5)
+            val tasks: Int = cursor.getInt(6)
             TaskName!!.add(taskn)
             initialValue!!.add(taski)
             finalValue!!.add(taskf)
             dateValue?.add(taskd)
             timeValue?.add(taskt)
             reminderValue?.add(taskr)
+            statusValue.add(tasks)
+        } while (cursor.moveToNext())
+    }
+    private fun selectCompleteData() {
+        val db: SQLiteDatabase = dbHelper!!.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM tasks WHERE status = 1", arrayOf())
+        cursor.moveToFirst()
+        do {
+            val taskn: String = cursor.getString(0)
+            val taski: Int = cursor.getInt(1)
+            val taskf: Int = cursor.getInt(2)
+            val taskd: String = cursor.getString(3)
+            val taskt: String = cursor.getString(4)
+            val taskr: String = cursor.getString(5)
+            val tasks: Int = cursor.getInt(6)
+            TaskNameComplete.add(taskn)
+            initialValueComplete!!.add(taski)
+            finalValueComplete!!.add(taskf)
+            dateValueComplete?.add(taskd)
+            timeValueComplete?.add(taskt)
+            reminderValueComplete?.add(taskr)
+            statusValueComplete.add(tasks)
         } while (cursor.moveToNext())
     }
 
@@ -181,13 +252,78 @@ class MainActivity : AppCompatActivity() {
         return rowCount.toString().toInt()
     }
 
+
+//    private fun setOnCompleteClick(){
+//
+//
+////        listenerComplete = object : CompleteTaskAdapter.RecyclerViewClickListener {
+////            override fun onClick(view: View?, position: Int) {
+////                status = findViewById<CheckBox>(R.id.statusCheck)
+////                status.setOnCheckedChangeListener { compoundButton,   b ->
+////
+////
+////            }
+////        }
+//    }
+
     private fun setOnClickListener() {
+
         listener = object : TaskAdapter.RecyclerViewClickListener {
+
             override fun onClick(view: View?, position: Int) {
-//                val dialogView = layoutInflater.inflate(R.layout.changer_dialog_card, null)
-//                val customDialog = AlertDialog.Builder(this@MainActivity)
-//                    .setView(dialogView)
-//                    .show()
+
+//                status = findViewById<CheckBox>(R.id.statusCheck)
+//                status.setOnClickListener { b->
+//
+//                    if (status.isChecked) {
+//                        Toast.makeText(applicationContext,"Status",Toast.LENGTH_SHORT).show()
+//                        val name = TaskName!![position]
+//                        dbHelper!!.CompletedStatus(name)
+//                        TaskNameComplete.add(TaskName[position])
+//                        initialValueComplete!!.add(initialValue!![position])
+//                        finalValueComplete!!.add(finalValue!![position])
+//                        dateValueComplete?.add(dateValue!![position])
+//                        timeValueComplete?.add(timeValue!![position])
+//                        reminderValueComplete?.add(reminderValue!![position])
+//                        statusValueComplete.add(1)
+//                        adapterComplete!!.notifyItemInserted(TaskNameComplete.size-1)
+//
+//                        statusValue.removeAt(position)
+//                        TaskName!!.removeAt(position)
+//                        initialValue!!.removeAt(position)
+//                        finalValue!!.removeAt(position)
+//                        dateValue?.removeAt(position)
+//                        timeValue?.removeAt(position)
+//                        reminderValue?.removeAt(position)
+//
+//                        adapter!!.notifyDataSetChanged()
+//                    }else if(!status.isChecked){
+//                        val name = TaskNameComplete!![position]
+//                        dbHelper!!.InCompleteStatus(name)
+//
+//                        TaskName!!.add(TaskNameComplete[position])
+//                        initialValue!!.add(initialValueComplete!![position])
+//                        finalValue!!.add(finalValueComplete!![position])
+//                        dateValue?.add(dateValueComplete!![position])
+//                        timeValue?.add(timeValueComplete!![position])
+//                        reminderValue?.add(reminderValueComplete!![position])
+//                        statusValue.add(0)
+//
+//                        statusValueComplete.removeAt(position)
+//                        TaskNameComplete.removeAt(position)
+//                        initialValueComplete!!.removeAt(position)
+//                        finalValueComplete!!.removeAt(position)
+//                        dateValueComplete?.removeAt(position)
+//                        timeValueComplete?.removeAt(position)
+//                        reminderValueComplete?.removeAt(position)
+//
+//                        adapter!!.notifyItemInserted(TaskName.size-1)
+//                        adapterComplete!!.notifyDataSetChanged()
+//
+//                    }
+//                }
+
+
                 bottomNav2 = findViewById<BottomNavigationView>(R.id.bottomNav2)
                 bottomNav.visibility = View.GONE
                 bottomNav2.visibility = View.VISIBLE
@@ -226,13 +362,19 @@ class MainActivity : AppCompatActivity() {
                             initialValue!!.add(position, initial)
                             adapter!!.notifyItemChanged(position)
                         }
+
                     }
                 }
                 bottomNav.visibility = View.GONE
                 bottomNav2.visibility = View.VISIBLE
 
             }
+
+//            override fun onItemClick(view: View?, position: Int) {
+//
+//            }
         }
 
     }
+
 }

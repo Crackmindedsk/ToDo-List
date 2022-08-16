@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.sharlene.todolist.model.TaskAdapter
 import java.util.*
 
 class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, version) {
@@ -16,7 +17,7 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
     }
 
     override fun onCreate(p0: SQLiteDatabase?) {
-        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER , date VARCHAR DEFAULT NULL, time VARCHAR DEFAULT NULL, reminder VARCHAR DEFAULT NULL, status INT DEFAULT NULL)"
+        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER , date VARCHAR DEFAULT NULL, time VARCHAR DEFAULT NULL, reminder VARCHAR DEFAULT NULL)"
         p0?.execSQL(CREATE)
     }
 
@@ -43,6 +44,23 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
         return count.toInt()
     }
 
+    fun readComplete():Int{
+        val query = "SELECT * FROM tasks WHERE status = 1"
+        val db:SQLiteDatabase = readableDatabase
+        val cursor:Cursor = db.rawQuery(query,null)
+        val num = cursor.count
+        val count = DatabaseUtils.queryNumEntries(db,"tasks","status = 1")
+        return num
+    }
+
+    fun readInComplete():Int{
+        val query = "SELECT * FROM tasks WHERE status = 0"
+        val db:SQLiteDatabase = readableDatabase
+        val cursor:Cursor = db.rawQuery(query,null)
+        val num = cursor.count
+        return num
+    }
+
     fun readSpecific(Name: String): Cursor? {
         val db =writableDatabase
         val select = "SELECT * FROM tasks WHERE task_name = '$Name'"
@@ -54,6 +72,13 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
         val select = "UPDATE tasks SET initial = '$Initial' WHERE task_name = '$Name' AND '$Initial'<= final AND '$Initial'>=0"
         db.execSQL(select)
     }
+    fun updateCheck(){
+        val db = this.writableDatabase
+//        val create = "ALTER TABLE tasks ADD status INT DEFAULT 0"
+        val select = "UPDATE tasks SET status = 0"
+//        db.execSQL(create)
+        db.execSQL(select)
+    }
 
     fun delete (Name: String){
         val db : SQLiteDatabase = this.writableDatabase
@@ -61,7 +86,17 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
         db.execSQL(delete)
     }
 
-    fun CompletedStatus(){}
+    fun CompletedStatus(Name: String){
+        val db:SQLiteDatabase = this.writableDatabase
+        val status = "UPDATE tasks SET status = 1 WHERE task_name = '$Name'"
+        db.execSQL(status)
+    }
+
+    fun InCompleteStatus(Name: String){
+        val db:SQLiteDatabase = this.writableDatabase
+        val status = "UPDATE tasks SET status = 0 WHERE task_name = '$Name'"
+        db.execSQL(status)
+    }
 
 
 }
