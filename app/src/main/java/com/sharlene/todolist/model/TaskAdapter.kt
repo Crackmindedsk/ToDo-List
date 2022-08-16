@@ -1,8 +1,6 @@
 package com.sharlene.todolist.model
 
 import android.content.Context
-import android.database.sqlite.SQLiteOpenHelper
-import android.graphics.Paint
 import android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
@@ -43,6 +41,7 @@ class TaskAdapter(val context: Context,
         override fun onClick(p0: View?) {
 //            if (p0 == card){
                 listener?.onClick(itemView, adapterPosition)
+            listener?.onClick(status,adapterPosition)
 //            }else if(p0 == status){
 //                listener?.onItemClick(status,adapterPosition)
 //            }
@@ -111,30 +110,27 @@ class TaskAdapter(val context: Context,
         holder.status.setOnCheckedChangeListener { compoundButton, b ->
             if(holder.status.isChecked){
                 holder.task.paintFlags =  holder.task.paintFlags or STRIKE_THRU_TEXT_FLAG
-                statusValue.set(position,1)
-                notifyItemChanged(position)
-                TaskDbHelper(context).CompletedStatus(taskname[position].toString())
+                Add(statusValue, position, context)
             }else if (!holder.status.isChecked){
                 holder.task.paintFlags = holder.task.paintFlags and STRIKE_THRU_TEXT_FLAG.inv()
-                statusValue.set(position,0)
-                notifyItemChanged(position)
-                TaskDbHelper(context).InCompleteStatus(taskname[position].toString())
+                Add(statusValue,position, context)
             }
+
         }
-
-
-//        holder.status.setOnClickListener(object : View.OnClickListener {
-//            override fun onClick(p0: View?) {
-//
-//            }
-//
-//        })
 
     }
 
     fun Add(statusValue: ArrayList<Int>,position: Int,context: Context){
-        statusValue.add(position,1)
-        val db : Unit = TaskDbHelper(context).CompletedStatus(taskname[position].toString())
+        if(statusValue[position] == 0){
+            statusValue.set(position,1)
+            Runnable({ notifyItemChanged(position) })
+            TaskDbHelper(context).CompletedStatus(taskname[position].toString())
+        }else if(statusValue[position] == 1){
+            statusValue.set(position,0)
+            Runnable({ notifyItemChanged(position) })
+            TaskDbHelper(context).InCompleteStatus(taskname[position].toString())
+        }
+
 
     }
 

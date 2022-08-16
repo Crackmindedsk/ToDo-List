@@ -2,6 +2,7 @@ package com.sharlene.todolist
 
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -273,6 +274,17 @@ class MainActivity : AppCompatActivity() {
             override fun onClick(view: View?, position: Int) {
 
 //                status = findViewById<CheckBox>(R.id.statusCheck)
+//                status.setOnCheckedChangeListener { compoundButton, b ->
+//                    if(status.isChecked){
+//                        statusValue[position] = 1
+//                        adapter!!.notifyItemChanged(position)
+//                        dbHelper!!.CompletedStatus(TaskName[position].toString())
+//                    }else if (!status.isChecked){
+//                        statusValue.set(position,0)
+//                        adapter!!.notifyItemChanged(position)
+//                        dbHelper!!.InCompleteStatus(TaskName[position].toString())
+//                    }
+//                }
 //                status.setOnClickListener { b->
 //
 //                    if (status.isChecked) {
