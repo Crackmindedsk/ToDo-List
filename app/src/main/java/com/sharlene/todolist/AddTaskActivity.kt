@@ -22,7 +22,6 @@ class AddTaskActivity : AppCompatActivity() {
     lateinit var name: TextInputEditText
     lateinit var initial: TextInputEditText
     lateinit var final: TextInputEditText
-    lateinit var textField: TextInputLayout
     lateinit var date: TextInputEditText
     lateinit var time: TextInputEditText
     var cal = Calendar.getInstance()
@@ -39,7 +38,6 @@ class AddTaskActivity : AppCompatActivity() {
         final = findViewById(R.id.edit3)
         date = findViewById(R.id.date_picker_actions)
         time = findViewById(R.id.time)
-
         date.setOnClickListener {
             updateDateInView()
         }
@@ -47,10 +45,6 @@ class AddTaskActivity : AppCompatActivity() {
             timePickerFun()
         }
 
-        textField = findViewById(R.id.remainder)
-        val items = listOf("5 Minute before", "30 Minute before", "1 Hour Before", "Custom Time")
-        val adapter = ArrayAdapter(applicationContext, R.layout.list_item, items)
-        (textField.editText as? AutoCompleteTextView)?.setAdapter(adapter)
 
         btDismiss.setOnClickListener {
             if (name.text.toString() == "" || initial.text.toString() == "" || final.text.toString() == "") {
@@ -85,7 +79,7 @@ class AddTaskActivity : AppCompatActivity() {
         val finalTask = final.text.toString().toInt()
         val date = date.text.toString()
         val time = time.text.toString()
-        val reminder = textField.editText?.text.toString()
+        val reminder = ""
         dbHelper!!.insert(nameTask, initialTask, finalTask,date,time,reminder,db)
 
     }

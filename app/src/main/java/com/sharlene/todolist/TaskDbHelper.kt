@@ -72,11 +72,9 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
         val select = "UPDATE tasks SET initial = '$Initial' WHERE task_name = '$Name' AND '$Initial'<= final AND '$Initial'>=0"
         db.execSQL(select)
     }
-    fun updateCheck(){
+    fun updateRemainder(Name: String,reminder:String){
         val db = this.writableDatabase
-//        val create = "ALTER TABLE tasks ADD status INT DEFAULT 0"
-        val select = "UPDATE tasks SET status = 0"
-//        db.execSQL(create)
+        val select = "UPDATE tasks SET reminder = '$reminder' WHERE task_name = '$Name'"
         db.execSQL(select)
     }
 

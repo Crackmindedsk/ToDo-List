@@ -9,6 +9,7 @@
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/drawable/ic_date.xml" value="0.1" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/drawable/ic_edit.xml" value="0.1415" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/drawable/ic_minus.xml" value="0.1235" />
+        <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/drawable/ic_reminder.xml" value="0.105" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/drawable/ic_time.xml" value="0.1" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/layout/activity_add_task.xml" value="0.16666666666666666" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/layout/activity_general_task.xml" value="0.1" />
@@ -19,10 +20,11 @@
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/layout/changer_dialog_card.xml" value="0.17777777777777778" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/layout/empty_activity.xml" value="0.1" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/layout/list_item.xml" value="0.1" />
-        <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/layout/progress_card.xml" value="0.22" />
+        <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/layout/progress_card.xml" value="0.31844660194174756" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/menu/bottom_nav_menu.xml" value="0.1" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/menu/main_menu.xml" value="0.16666666666666666" />
         <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/menu/progress_menu.xml" value="0.18333333333333332" />
+        <entry key="..\:/AndroidWork/ToDoList/app/src/main/res/menu/reminder_menu.xml" value="0.18333333333333332" />
       </map>
     </option>
   </component>

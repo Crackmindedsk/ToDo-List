@@ -3,12 +3,9 @@ package com.sharlene.todolist.model
 import android.content.Context
 import android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
 import android.util.SparseBooleanArray
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.view.*
+import android.widget.*
+import androidx.annotation.MenuRes
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.sharlene.todolist.R
@@ -20,7 +17,7 @@ class TaskAdapter(val context: Context,
                   var finalValue:ArrayList<*>,
                   var dateValue:ArrayList<*>,
                   var timeValue: ArrayList<*>,
-                  var reminderValue: ArrayList<*>,
+                  var reminderValue: ArrayList<String>,
                   var statusValue: ArrayList<Int>,
                   private val listener: RecyclerViewClickListener?)
     :RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
@@ -38,6 +35,7 @@ class TaskAdapter(val context: Context,
         var reminder: TextView
         var status:CheckBox
         var card:CardView
+        var reminderIcon: ImageButton
         override fun onClick(p0: View?) {
 //            if (p0 == card){
                 listener?.onClick(itemView, adapterPosition)
@@ -56,8 +54,10 @@ class TaskAdapter(val context: Context,
             reminder = itemView.findViewById(R.id.reminder)
             status = itemView.findViewById(R.id.statusCheck)
             card = itemView.findViewById(R.id.card)
+            reminderIcon = itemView.findViewById(R.id.reminder_icon)
             itemView.setOnClickListener(this)
             status.setOnClickListener(this)
+            reminderIcon.setOnClickListener(this)
 
 //            status.setOnClickListener {
 //                if (!checkBoxStateArray.get(adapterPosition,false)){
@@ -92,34 +92,85 @@ class TaskAdapter(val context: Context,
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         holder.task.text = taskname[position].toString()
-        holder.track.text =
-            initialValue[position].toString() + " / " + finalValue[position].toString()
-        holder.process.progress = initialValue[position].toString().toInt()
         holder.process.max = finalValue[position].toString().toInt()
         holder.dateTime.text = dateValue[position].toString() + ", " + timeValue[position].toString()
         holder.reminder.text = reminderValue[position].toString()
         if(statusValue[position] == 1){
             holder.status.isChecked = true
             holder.task.paintFlags =  holder.task.paintFlags or STRIKE_THRU_TEXT_FLAG
+            holder.track.text = finalValue[position].toString() + " / " + finalValue[position].toString()
+            holder.process.progress = finalValue[position].toString().toInt()
+
         }else{
             holder.status.isChecked = false
             holder.task.paintFlags = holder.task.paintFlags and STRIKE_THRU_TEXT_FLAG.inv()
+            holder.track.text = initialValue[position].toString() + " / " + finalValue[position].toString()
+            holder.process.progress = initialValue[position].toString().toInt()
         }
 //        holder.status.isChecked = statusValue[position].toString().toInt() == 1
 
         holder.status.setOnCheckedChangeListener { compoundButton, b ->
             if(holder.status.isChecked){
                 holder.task.paintFlags =  holder.task.paintFlags or STRIKE_THRU_TEXT_FLAG
+                holder.track.text = finalValue[position].toString() + " / " + finalValue[position].toString()
+                holder.process.progress = finalValue[position].toString().toInt()
                 Add(statusValue, position, context)
             }else if (!holder.status.isChecked){
                 holder.task.paintFlags = holder.task.paintFlags and STRIKE_THRU_TEXT_FLAG.inv()
+                holder.track.text = initialValue[position].toString() + " / " + finalValue[position].toString()
+                holder.process.progress = initialValue[position].toString().toInt()
                 Add(statusValue,position, context)
             }
 
         }
 
+        holder.reminderIcon.setOnClickListener{v->
+            var time:String = null.toString()
+            val popup = PopupMenu(context!!, v)
+            popup.menuInflater.inflate(R.menu.reminder_menu,popup.menu)
+//        popup.menu.add(Menu.NONE,0,0,"5")
+//        popup.menu.add(Menu.NONE,1,1,"30")
+//        popup.menu.add(Menu.NONE,2,2,"1")
+
+            popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+                if (menuItem.itemId == R.id.five){
+                    holder.reminder.text = menuItem.title.toString()
+                    ReminderAdd(reminderValue,position,context,menuItem.title.toString())
+                }else if (menuItem.itemId ==R.id.thirty){
+                    holder.reminder.text = menuItem.title.toString()
+                    ReminderAdd(reminderValue,position,context,menuItem.title.toString())
+                }else if (menuItem.itemId == R.id.one){
+                    holder.reminder.text = menuItem.title.toString()
+                    ReminderAdd(reminderValue,position,context,menuItem.title.toString())
+                }else if (menuItem.itemId == R.id.custom){
+                    holder.reminder.text = menuItem.title.toString()
+                    ReminderAdd(reminderValue,position,context,menuItem.title.toString())
+                }
+                false
+                // Respond to menu item click.
+
+            }
+            popup.show()
+
+
+//            val items = listOf("5 Minute before", "30 Minute before", "1 Hour Before", "Custom Time")
+//            val adapter = ArrayAdapter.createFromResource(context,R.array.Reminder,
+//                androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
+//            adapter.setDropDownViewResource(androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
+////            holder.reminder.text as? AutoCompleteTextView)?.setAdapter(adapter)
+//            holder.spinner.adapter = adapter
+//            time=holder.spinner
+//            time = holder.reminder.text.toString()
+//            ReminderAdd(reminderValue,position,context,time)
+        }
+
     }
 
+    fun ReminderAdd(reminderValue: ArrayList<String>,position: Int,context: Context,value: String){
+        reminderValue.set(position, value)
+        Runnable({notifyItemChanged(position)})
+        TaskDbHelper(context).updateRemainder(taskname[position].toString(), value)
+    }
     fun Add(statusValue: ArrayList<Int>,position: Int,context: Context){
         if(statusValue[position] == 0){
             statusValue.set(position,1)
