@@ -12,10 +12,14 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.Toast
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class AddTaskActivity : AppCompatActivity() {
 
@@ -26,6 +30,11 @@ class AddTaskActivity : AppCompatActivity() {
     lateinit var time: TextInputEditText
     var cal = Calendar.getInstance()
     var dbHelper: TaskDbHelper? = null
+    var chosenyear=0
+    var chosenmonth=0
+    var chosenday=0
+    var chosenhour=0
+    var chosenmin=0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +60,7 @@ class AddTaskActivity : AppCompatActivity() {
                 Toast.makeText(this, "Fill the required details", Toast.LENGTH_SHORT).show()
             } else {
                 storeData()
+                setReminder()
                 Toast.makeText(this, "Data added Successfully", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(applicationContext, MainActivity::class.java))
             }
@@ -68,7 +78,11 @@ class AddTaskActivity : AppCompatActivity() {
             DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, tyear, tmonth, tday ->
                 val str = String.format("%d / %d / %d",tday,tmonth+1,tyear)
                 date.text = str.toEditable()
+                chosenyear = tyear
+                chosenmonth= tmonth
+                chosenday=tday
             }, year, month, day)
+
         datePickerDialog.show()
     }
 
@@ -94,8 +108,30 @@ class AddTaskActivity : AppCompatActivity() {
             TimePickerDialog(this, TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
                 val str = String.format("%d : %d",hour,minute)
                 time.text = str.toEditable()
+                chosenhour=hour
+                chosenmin=minute
             },hour,min,false)
         timePicker.show()
+    }
+    fun setReminder(){
+        val userSelectedDateTime = Calendar.getInstance()
+        userSelectedDateTime.set(chosenyear,chosenmonth,chosenday,chosenhour,chosenmin)
+        val todayDateTime = Calendar.getInstance()
+        val delayInSeconds =(userSelectedDateTime.timeInMillis/1000L) - (todayDateTime.timeInMillis/1000L)
+        createWorkRequest("Reminder",delayInSeconds)
+        Toast.makeText(this,"Reminder set",Toast.LENGTH_SHORT).show()
+    }
+    fun createWorkRequest(message: String, timeDelayInSeconds: Long){
+        val myWorkRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
+            .setInitialDelay(timeDelayInSeconds, TimeUnit.SECONDS)
+            .setInputData(
+                workDataOf(
+                "title" to "Reminder",
+                "message" to "123",
+            )
+            )
+            .build()
+        WorkManager.getInstance(applicationContext).enqueue(myWorkRequest)
     }
 
 }
