@@ -4,9 +4,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -14,7 +18,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.test.core.app.ApplicationProvider
 
-class Notification(val context: Context) {
+class Notification(val context: Context){
     private val CHANNEL_ID = "reminder_channel_id"
     private val NOTIFICATON_ID = 1
 
@@ -29,10 +33,13 @@ class Notification(val context: Context) {
             .setContentTitle(title)
             .setContentText(message)
             .setSmallIcon(R.drawable.ic_add)
+            .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+"://"+context.packageName+"/"+R.raw.nuclear_alarm))
             .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
+
         NotificationManagerCompat.from(context).notify(NOTIFICATON_ID,notification)
+
     }
     private fun createNotificationChannel(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -43,5 +50,6 @@ class Notification(val context: Context) {
             notificationManager.createNotificationChannel(channel)
         }
     }
+
 
 }

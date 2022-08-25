@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         if (id == R.id.setting) {
             return true
         } else if (id == R.id.alarm_tone) {
+            startActivity(Intent(applicationContext,AlarmToneActivity::class.java))
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -100,6 +101,7 @@ class MainActivity : AppCompatActivity() {
 //            selectData()
 //            setOnClickListener()
 //        dbHelper!!.updateCheck()
+//        dbHelper!!.AlterTable()
 
         if (dbHelper!!.readAll() == 0) {
             viewList.visibility = View.GONE

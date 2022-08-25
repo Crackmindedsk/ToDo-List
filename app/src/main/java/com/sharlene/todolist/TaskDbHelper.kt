@@ -95,6 +95,26 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
         val status = "UPDATE tasks SET status = 0 WHERE task_name = '$Name'"
         db.execSQL(status)
     }
+    fun AlterTable(){
+        val db:SQLiteDatabase = this.writableDatabase
+        val alter= "ALTER TABLE tasks ADD COLUMN ringtone INT DEFAULT 0 "
+        db.execSQL(alter)
+    }
+    fun insertRingtone(Ringtone: Int){
+        val db = this.writableDatabase
+        val update= " UPDATE tasks SET ringtone = '$Ringtone'"
+        db.execSQL(update)
+    }
+    fun selectRingtone(): Int {
+        val db = this.readableDatabase
+        val select:Cursor = db.rawQuery("SELECT ringtone FROM tasks LIMIT 1", arrayOf())
+        select.moveToFirst()
+        var tone:Int
+        do {
+           tone = select.getInt(0)
+        }while (select.moveToNext())
+        return tone
+    }
 
 
 }
