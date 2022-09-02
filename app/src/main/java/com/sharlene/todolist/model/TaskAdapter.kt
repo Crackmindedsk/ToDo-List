@@ -2,14 +2,18 @@ package com.sharlene.todolist.model
 
 import android.content.Context
 import android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+import android.icu.text.CaseMap
 import android.util.SparseBooleanArray
 import android.view.*
 import android.widget.*
 import androidx.annotation.MenuRes
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.sharlene.todolist.R
-import com.sharlene.todolist.TaskDbHelper
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.sharlene.todolist.*
+import java.util.concurrent.TimeUnit
 
 class TaskAdapter(val context: Context,
                   var taskname:ArrayList<*>,
@@ -24,6 +28,7 @@ class TaskAdapter(val context: Context,
 
     private val VIEW_TYPE_DATE = 1
     private val VIEW_TYPE_EMPTY = 2
+    val timeActivity:AddTaskActivity = AddTaskActivity()
     var checkBoxStateArray = SparseBooleanArray()
 
     inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -95,13 +100,23 @@ class TaskAdapter(val context: Context,
         holder.process.max = finalValue[position].toString().toInt()
         holder.dateTime.text = dateValue[position].toString() + ", " + timeValue[position].toString()
         holder.reminder.text = reminderValue[position].toString()
-        if(statusValue[position] == 1){
+
+        if (initialValue[position] == finalValue[position]) {
+            holder.status.isChecked = true
+            holder.task.paintFlags = holder.task.paintFlags or STRIKE_THRU_TEXT_FLAG
+            holder.track.text =
+                initialValue[position].toString() + " / " + finalValue[position].toString()
+            holder.process.progress = initialValue[position].toString().toInt()
+            statusValue[position] = 1
+            TaskDbHelper(context).CompletedStatus(taskname[position].toString())
+        }
+        else if(statusValue[position] == 1){
             holder.status.isChecked = true
             holder.task.paintFlags =  holder.task.paintFlags or STRIKE_THRU_TEXT_FLAG
             holder.track.text = finalValue[position].toString() + " / " + finalValue[position].toString()
             holder.process.progress = finalValue[position].toString().toInt()
 
-        }else{
+        }else if(statusValue[position] == 0){
             holder.status.isChecked = false
             holder.task.paintFlags = holder.task.paintFlags and STRIKE_THRU_TEXT_FLAG.inv()
             holder.track.text = initialValue[position].toString() + " / " + finalValue[position].toString()
@@ -135,16 +150,20 @@ class TaskAdapter(val context: Context,
             popup.setOnMenuItemClickListener { menuItem: MenuItem ->
                 if (menuItem.itemId == R.id.five){
                     holder.reminder.text = menuItem.title.toString()
-                    ReminderAdd(reminderValue,position,context,menuItem.title.toString())
+                    val Remindtime = (timeActivity.delayInSeconds) - (5/1000L)
+                    ReminderAdd(reminderValue,position,context,menuItem.title.toString(),Remindtime)
                 }else if (menuItem.itemId ==R.id.thirty){
                     holder.reminder.text = menuItem.title.toString()
-                    ReminderAdd(reminderValue,position,context,menuItem.title.toString())
+                    val Remindtime = (timeActivity.delayInSeconds) - (5/1000L)
+                    ReminderAdd(reminderValue,position,context,menuItem.title.toString(),Remindtime)
                 }else if (menuItem.itemId == R.id.one){
                     holder.reminder.text = menuItem.title.toString()
-                    ReminderAdd(reminderValue,position,context,menuItem.title.toString())
+                    val Remindtime = (timeActivity.delayInSeconds) - (5/1000L)
+                    ReminderAdd(reminderValue,position,context,menuItem.title.toString(),Remindtime)
                 }else if (menuItem.itemId == R.id.custom){
                     holder.reminder.text = menuItem.title.toString()
-                    ReminderAdd(reminderValue,position,context,menuItem.title.toString())
+                    val Remindtime = (timeActivity.delayInSeconds) - (5/1000L)
+                    ReminderAdd(reminderValue,position,context,menuItem.title.toString(),Remindtime)
                 }
                 false
                 // Respond to menu item click.
@@ -166,9 +185,20 @@ class TaskAdapter(val context: Context,
 
     }
 
-    fun ReminderAdd(reminderValue: ArrayList<String>,position: Int,context: Context,value: String){
+    fun ReminderAdd(reminderValue: ArrayList<String>,position: Int,context: Context,value: String, timeDelayInSeconds:Long ){
         reminderValue.set(position, value)
         Runnable({notifyItemChanged(position)})
+        val str =taskname[position].toString()
+        val myWorkRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
+            .setInitialDelay(timeDelayInSeconds, TimeUnit.SECONDS)
+            .setInputData(
+                workDataOf(
+                    "title" to str,
+                    "message" to "Your have pending task $str"
+                )
+            )
+            .build()
+        WorkManager.getInstance(context).enqueue(myWorkRequest)
         TaskDbHelper(context).updateRemainder(taskname[position].toString(), value)
     }
     fun Add(statusValue: ArrayList<Int>,position: Int,context: Context){

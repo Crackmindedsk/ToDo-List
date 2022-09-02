@@ -10,9 +10,11 @@ import androidx.work.WorkerParameters
 
 class ReminderWorker(val context: Context, val parameter: WorkerParameters):Worker(context,parameter) {
     override fun doWork(): Result {
+        val title =inputData.getString("title")
+        val message = inputData.getString("message")
         Notification(context).createNotification(
-            "Hello",
-            "Reminder"
+            title.toString(),
+            message.toString()
         )
         val tone = inputData.getInt("tone",R.raw.beep_beep_tone)
         playRingtone(tone)

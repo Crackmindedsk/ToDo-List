@@ -14,10 +14,11 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
     companion object{
         private const val database="Task"
         private const val version = 1
+        private const val tone =R.raw.beep_beep_tone
     }
 
     override fun onCreate(p0: SQLiteDatabase?) {
-        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER , date VARCHAR DEFAULT NULL, time VARCHAR DEFAULT NULL, reminder VARCHAR DEFAULT NULL)"
+        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER , date VARCHAR DEFAULT NULL, time VARCHAR DEFAULT NULL, reminder VARCHAR DEFAULT NULL,status INT DEFAULT 0, ringtone INT DEFAULT $tone )"
         p0?.execSQL(CREATE)
     }
 
@@ -69,7 +70,7 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
 
     fun update(Name:String,Initial: Int){
         val db = this.writableDatabase
-        val select = "UPDATE tasks SET initial = '$Initial' WHERE task_name = '$Name' AND '$Initial'<= final AND '$Initial'>=0"
+        val select = "UPDATE tasks SET initial = '$Initial' WHERE task_name = '$Name'"
         db.execSQL(select)
     }
     fun updateRemainder(Name: String,reminder:String){

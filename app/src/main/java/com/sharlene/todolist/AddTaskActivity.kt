@@ -41,6 +41,7 @@ class AddTaskActivity : AppCompatActivity() {
     var chosenday=0
     var chosenhour=0
     var chosenmin=0
+    var delayInSeconds :Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +63,7 @@ class AddTaskActivity : AppCompatActivity() {
 
 
         btDismiss.setOnClickListener {
-            if (name.text.toString() == "" || initial.text.toString() == "" || final.text.toString() == "") {
+            if (name.text.toString() == "" || initial.text.toString() == "" || final.text.toString() == "" || date.text.toString()==""  || time.text.toString()=="") {
                 Toast.makeText(this, "Fill the required details", Toast.LENGTH_SHORT).show()
             } else {
                 storeData()
@@ -123,12 +124,12 @@ class AddTaskActivity : AppCompatActivity() {
         val userSelectedDateTime = Calendar.getInstance()
         userSelectedDateTime.set(chosenyear,chosenmonth,chosenday,chosenhour,chosenmin)
         val todayDateTime = Calendar.getInstance()
-        val delayInSeconds =(userSelectedDateTime.timeInMillis/1000L) - (todayDateTime.timeInMillis/1000L)
+        delayInSeconds = ((userSelectedDateTime.timeInMillis/1000L) - (todayDateTime.timeInMillis/1000L))
 
 
         val str = dbHelper!!.selectRingtone()
         Toast.makeText(applicationContext,"$str",Toast.LENGTH_SHORT).show()
-        createWorkRequest(str,delayInSeconds)
+        createWorkRequest(str,delayInSeconds,name.text.toString())
         Toast.makeText(this,"Reminder set",Toast.LENGTH_SHORT).show()
 //        val intent = Intent(applicationContext,MainActivity::class.java)
 //        val pendingIntent = PendingIntent.getActivity(applicationContext,0,intent,0)
@@ -137,13 +138,13 @@ class AddTaskActivity : AppCompatActivity() {
 
     }
 
-    fun createWorkRequest(message: Int, timeDelayInSeconds: Long){
+    fun createWorkRequest(message: Int, timeDelayInSeconds: Long,Title :String){
         val myWorkRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
             .setInitialDelay(timeDelayInSeconds, TimeUnit.SECONDS)
             .setInputData(
                 workDataOf(
-                "title" to "Reminder",
-                "message" to "123",
+                "title" to Title,
+                "message" to "Your have pending task $Title",
                     "tone" to message
             )
             )

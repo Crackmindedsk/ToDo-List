@@ -54,6 +54,9 @@ class MainActivity : AppCompatActivity() {
     var reminderValueComplete: ArrayList<String>? = null
     lateinit var statusValueComplete:ArrayList<Int>
     var adapterComplete: TaskAdapter? = null
+    lateinit var viewList:RecyclerView
+    lateinit var completeList:RecyclerView
+    lateinit var empty: ConstraintLayout
 
 
 
@@ -77,8 +80,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_view)
-        val viewList = findViewById<View>(R.id.recycler_view) as RecyclerView
-        val completeList = findViewById<View>(R.id.recycler_view_completed) as RecyclerView
+        viewList = findViewById<View>(R.id.recycler_view) as RecyclerView
+        completeList = findViewById<View>(R.id.recycler_view_completed) as RecyclerView
         TaskName = ArrayList()
         initialValue = ArrayList()
         finalValue = ArrayList()
@@ -96,7 +99,7 @@ class MainActivity : AppCompatActivity() {
 
 
         dbHelper = TaskDbHelper(this)
-        val empty: ConstraintLayout = findViewById(R.id.empty_view)
+        empty= findViewById(R.id.empty_view)
 
 //            selectData()
 //            setOnClickListener()
@@ -108,11 +111,10 @@ class MainActivity : AppCompatActivity() {
             empty.visibility = View.VISIBLE
         } else {
             empty.visibility = View.GONE
-            if(dbHelper!!.readInComplete() == 0){
-                viewList.visibility = View.GONE
-            }else{
+//            if(dbHelper!!.readInComplete() == 0){
+//                viewList.visibility = View.GONE
+//            }else{
                 viewList.visibility = View.VISIBLE
-
                 selectData()
                 setOnClickListener()
                 adapter = TaskAdapter(
@@ -128,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 viewList.adapter = adapter
                 viewList.layoutManager = LinearLayoutManager(this)
-            }
+//            }
             completeList.visibility=View.GONE
 
 //            if(dbHelper!!.readComplete() == 0){
@@ -351,8 +353,11 @@ class MainActivity : AppCompatActivity() {
                     when (it.itemId) {
                         R.id.add -> {
                             var initial: Int = initialValue!![position]
+                            val final = finalValue!![position]
                             val name = TaskName!![position]
-                            initial++
+                            if(initial<final) {
+                                initial++
+                            }
                             dbHelper!!.update(name, initial)
                             initialValue!!.removeAt(position)
                             initialValue!!.add(position, initial)
@@ -369,14 +374,19 @@ class MainActivity : AppCompatActivity() {
                             timeValue?.removeAt(position)
                             reminderValue?.removeAt(position)
                             adapter!!.notifyItemRemoved(position)
-
                             bottomNav2.visibility = View.VISIBLE
                             bottomNav.visibility = View.GONE
+                            if (dbHelper!!.readAll() == 0) {
+                                viewList.visibility = View.GONE
+                                empty.visibility = View.VISIBLE
+                            }
                         }
                         R.id.minus -> {
                             var initial: Int = initialValue!![position]
                             val name = TaskName!![position]
-                            initial--
+                            if(initial>0) {
+                                initial--
+                            }
                             dbHelper!!.update(name, initial)
                             initialValue!!.removeAt(position)
                             initialValue!!.add(position, initial)
