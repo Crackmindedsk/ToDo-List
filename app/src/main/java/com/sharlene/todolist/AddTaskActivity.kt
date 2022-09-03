@@ -1,28 +1,21 @@
 package com.sharlene.todolist
 
-import android.app.*
-import android.content.BroadcastReceiver
-import android.content.Context
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
-import android.media.MediaPlayer
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.Toast
-import androidx.work.Data
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.ParseException
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
-import com.sharlene.todolist.alarm.MyAlarm
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -33,6 +26,7 @@ class AddTaskActivity : AppCompatActivity() {
     lateinit var final: TextInputEditText
     lateinit var date: TextInputEditText
     lateinit var time: TextInputEditText
+    var timeList: ArrayList<Long>? = null
     val selectAlarm=AlarmToneActivity()
     var cal = Calendar.getInstance()
     var dbHelper: TaskDbHelper? = null
@@ -47,6 +41,8 @@ class AddTaskActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
         dbHelper = TaskDbHelper(this)
+
+        timeList= ArrayList()
 
         val btDismiss = findViewById<Button>(R.id.add_btn)
         name = findViewById(R.id.edit1)
@@ -125,12 +121,12 @@ class AddTaskActivity : AppCompatActivity() {
         userSelectedDateTime.set(chosenyear,chosenmonth,chosenday,chosenhour,chosenmin)
         val todayDateTime = Calendar.getInstance()
         delayInSeconds = ((userSelectedDateTime.timeInMillis/1000L) - (todayDateTime.timeInMillis/1000L))
-
+        timeList!!.add(delayInSeconds)
+        Toast.makeText(applicationContext,"$delayInSeconds",Toast.LENGTH_SHORT).show()
+        dbHelper!!.insertDelay(name.text.toString(),delayInSeconds)
 
         val str = dbHelper!!.selectRingtone()
-        Toast.makeText(applicationContext,"$str",Toast.LENGTH_SHORT).show()
-        createWorkRequest(str,delayInSeconds,name.text.toString())
-        Toast.makeText(this,"Reminder set",Toast.LENGTH_SHORT).show()
+//        createWorkRequest(str,delayInSeconds,name.text.toString())
 //        val intent = Intent(applicationContext,MainActivity::class.java)
 //        val pendingIntent = PendingIntent.getActivity(applicationContext,0,intent,0)
 //        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
@@ -138,7 +134,10 @@ class AddTaskActivity : AppCompatActivity() {
 
     }
 
+
+
     fun createWorkRequest(message: Int, timeDelayInSeconds: Long,Title :String){
+
         val myWorkRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
             .setInitialDelay(timeDelayInSeconds, TimeUnit.SECONDS)
             .setInputData(

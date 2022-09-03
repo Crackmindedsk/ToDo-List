@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.database.DatabaseUtils
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.media.Ringtone
 import com.sharlene.todolist.model.TaskAdapter
 import java.util.*
 
@@ -18,7 +19,7 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
     }
 
     override fun onCreate(p0: SQLiteDatabase?) {
-        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER , date VARCHAR DEFAULT NULL, time VARCHAR DEFAULT NULL, reminder VARCHAR DEFAULT NULL,status INT DEFAULT 0, ringtone INT DEFAULT $tone )"
+        val CREATE = "CREATE TABLE tasks (task_name VARCHAR, initial INTEGER, final INTEGER , date VARCHAR DEFAULT NULL, time VARCHAR DEFAULT NULL, reminder VARCHAR DEFAULT NULL,status INT DEFAULT 0, ringtone INT DEFAULT $tone, delaytime LONG DEFAULT 0 )"
         p0?.execSQL(CREATE)
     }
 
@@ -113,6 +114,21 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
         var tone:Int
         do {
            tone = select.getInt(0)
+        }while (select.moveToNext())
+        return tone
+    }
+    fun insertDelay(taskName: String, timedelay:Long){
+        val db = this.writableDatabase
+        val update= " UPDATE tasks SET delaytime = '$timedelay' WHERE task_name = '$taskName'"
+        db.execSQL(update)
+    }
+    fun selectDelay(taskName: String): Long {
+        val db = this.readableDatabase
+        val select:Cursor = db.rawQuery("SELECT delaytime FROM tasks WHERE task_name = '$taskName'", arrayOf())
+        select.moveToFirst()
+        var tone:Long
+        do {
+            tone = select.getLong(0)
         }while (select.moveToNext())
         return tone
     }

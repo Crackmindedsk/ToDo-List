@@ -3,17 +3,27 @@ package com.sharlene.todolist.model
 import android.content.Context
 import android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
 import android.icu.text.CaseMap
+import android.icu.text.SimpleDateFormat
+import android.os.Build
+import android.util.Log
 import android.util.SparseBooleanArray
 import android.view.*
+import android.view.View.inflate
 import android.widget.*
 import androidx.annotation.MenuRes
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.net.ParseException
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.sharlene.todolist.*
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
+import kotlin.math.min
 
 class TaskAdapter(val context: Context,
                   var taskname:ArrayList<*>,
@@ -147,27 +157,27 @@ class TaskAdapter(val context: Context,
 //        popup.menu.add(Menu.NONE,1,1,"30")
 //        popup.menu.add(Menu.NONE,2,2,"1")
 
+
             popup.setOnMenuItemClickListener { menuItem: MenuItem ->
                 if (menuItem.itemId == R.id.five){
                     holder.reminder.text = menuItem.title.toString()
-                    val Remindtime = (timeActivity.delayInSeconds) - (5/1000L)
+                    val Remindtime = TaskDbHelper(context).selectDelay(taskname[position].toString()) - (5*60000/1000L)
                     ReminderAdd(reminderValue,position,context,menuItem.title.toString(),Remindtime)
                 }else if (menuItem.itemId ==R.id.thirty){
                     holder.reminder.text = menuItem.title.toString()
-                    val Remindtime = (timeActivity.delayInSeconds) - (5/1000L)
+                    val Remindtime = TaskDbHelper(context).selectDelay(taskname[position].toString()) - (30*60000/1000L)
                     ReminderAdd(reminderValue,position,context,menuItem.title.toString(),Remindtime)
                 }else if (menuItem.itemId == R.id.one){
                     holder.reminder.text = menuItem.title.toString()
-                    val Remindtime = (timeActivity.delayInSeconds) - (5/1000L)
+                    val Remindtime = TaskDbHelper(context).selectDelay(taskname[position].toString()) - (60*60000/1000L)
                     ReminderAdd(reminderValue,position,context,menuItem.title.toString(),Remindtime)
                 }else if (menuItem.itemId == R.id.custom){
                     holder.reminder.text = menuItem.title.toString()
-                    val Remindtime = (timeActivity.delayInSeconds) - (5/1000L)
-                    ReminderAdd(reminderValue,position,context,menuItem.title.toString(),Remindtime)
+                    dialogTime(position)
+
                 }
                 false
                 // Respond to menu item click.
-
             }
             popup.show()
 
@@ -185,16 +195,45 @@ class TaskAdapter(val context: Context,
 
     }
 
+    fun dialogTime(position:Int){
+        val dialog = LayoutInflater.from(context).inflate(R.layout.changer_dialog_card,null)
+        val customDialog = AlertDialog.Builder(context)
+            .setView(dialog)
+            .show()
+        val hour = customDialog.findViewById<EditText>(R.id.hour)
+        val minute = customDialog.findViewById<EditText>(R.id.minutes)
+        val set = customDialog.findViewById<Button>(R.id.set)
+        var hr:Long = 0
+        var min:Long= 0
+        set?.setOnClickListener {v->
+            if(hour!!.text.toString() == "" || minute!!.text.toString() == "" ){
+                Toast.makeText(context,"Fill the time",Toast.LENGTH_SHORT).show()
+            }else{
+                hr= hour.text.toString().toLong()
+                min= minute.text.toString().toLong()
+                val time = (hr*60*60000/1000L) + (min*60000/1000L)
+                val Remindtime = TaskDbHelper(context).selectDelay(taskname[position].toString()) - time
+
+                ReminderAdd(reminderValue,position,context,"$hr hours $min minute before",Remindtime)
+                customDialog.dismiss()
+            }
+        }
+
+    }
+
     fun ReminderAdd(reminderValue: ArrayList<String>,position: Int,context: Context,value: String, timeDelayInSeconds:Long ){
         reminderValue.set(position, value)
         Runnable({notifyItemChanged(position)})
         val str =taskname[position].toString()
+        val tone = TaskDbHelper(context).selectRingtone()
+
         val myWorkRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
             .setInitialDelay(timeDelayInSeconds, TimeUnit.SECONDS)
             .setInputData(
                 workDataOf(
                     "title" to str,
-                    "message" to "Your have pending task $str"
+                    "message" to "Your have pending task $str",
+                    "tone" to tone
                 )
             )
             .build()
@@ -232,6 +271,8 @@ class TaskAdapter(val context: Context,
     }
 
 }
+
+
 
 private fun <E> ArrayList<E>.add(index: E, element: E) {
 
