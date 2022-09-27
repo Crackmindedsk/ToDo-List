@@ -10,8 +10,8 @@ android {
         applicationId "com.sharlene.todolist"
         minSdk 21
         targetSdk 32
-        versionCode 3
-        versionName "1.4"
+        versionCode 4
+        versionName "2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
