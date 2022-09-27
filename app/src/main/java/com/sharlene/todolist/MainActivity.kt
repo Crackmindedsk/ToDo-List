@@ -1,10 +1,12 @@
 package com.sharlene.todolist
 
+import android.accounts.Account
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Paint
 import android.os.Bundle
 import android.os.Message
+import android.provider.ContactsContract
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -277,6 +279,7 @@ class MainActivity : AppCompatActivity() {
 ////        }
 //    }
 
+
     private fun setOnClickListener() {
 
         listener = object : TaskAdapter.RecyclerViewClickListener {
@@ -363,7 +366,15 @@ class MainActivity : AppCompatActivity() {
                             initialValue!!.add(position, initial)
                             adapter!!.notifyItemChanged(position)
                         }
-                        R.id.edit -> {}
+                        R.id.edit -> {
+                            val intent = Intent(applicationContext, EditActivity::class.java)
+                            intent.putExtra("name", TaskName[position])
+                            intent.putExtra("initial", initialValue!![position].toString())
+                            intent.putExtra("final", finalValue!![position].toString())
+                            intent.putExtra("date", dateValue!![position])
+                            intent.putExtra("time", timeValue!![position])
+                            startActivity(intent)
+                        }
                         R.id.delete -> {
                             val name = TaskName!![position]
                             dbHelper!!.delete(name)

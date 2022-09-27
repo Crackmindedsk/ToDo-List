@@ -133,5 +133,11 @@ class TaskDbHelper(context: Context):SQLiteOpenHelper(context, database,null, ve
         return tone
     }
 
+    fun editdata( task:String, taskName: String, intial: Int, final: Int, date: String,time: String){
+        val db = this. writableDatabase
+        val update = "UPDATE tasks SET task_name='$taskName', initial='$intial', final='$final', date = '$date', time = '$time' WHERE task_name='$task' "
+        db.execSQL(update)
+    }
+
 
 }
